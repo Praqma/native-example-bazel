@@ -74,15 +74,15 @@ jobs:
           name: Generate Graph
           command: |
             # export PATH="$PATH:$HOME/bin"
+            mkdir graphy
+            cd graphy
             bazel query 'deps(//mainy:mainy)' --output graph > graph.in
             dot -Tpng < graph.in > graph.png
             bazel query --noimplicit_deps 'deps(//mainy:mainy)' --output graph > simplified_graph.in
             dot -Tpng < simplified_graph.in > simplified_graph.png
+            cd -
       - store_artifacts:
-          path: ./*graph.in
-          destination: graphy
-      - store_artifacts:
-          path: ./*graph.png
+          path: graphy
           destination: graphy
       - store_artifacts:
           path: $(readlink bazel-bin)/mainy/*
