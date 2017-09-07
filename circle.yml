@@ -35,6 +35,13 @@ jobs:
             sudo apt-get install --yes pkg-config zip g++ zlib1g-dev unzip python
             gcc --version
       - run:
+          name: Setup Dot
+          command: |
+            set -x
+            echo "Setup Dot ..."
+            sudo apt-get install --yes graphviz
+            dot -V
+      - run:
           name: Setup Bazel
           # Bash (not sh) is required for interpreting the Bazel installer script.
           # The pkgconfig zip g++ zlib-dev unzip python tools required for decompressing installer.
@@ -46,7 +53,9 @@ jobs:
             chmod +x bazel-0.5.4-installer-linux-x86_64.sh
             ls -al
             ./bazel-0.5.4-installer-linux-x86_64.sh --user
-            export PATH="$PATH:$HOME/bin"
+            # export PATH="$PATH:$HOME/bin"
+            ls -aln ${HOME}/bin/bazel
+            sudo ln -s ${HOME}/bin/bazel /usr/bin/bazel
             bazel clean --expunge
             bazel build
             ls $(bazel info output_base)/external
@@ -54,13 +63,27 @@ jobs:
       - run:
           name: Build with Bazel
           command: |
-            export PATH="$PATH:$HOME/bin"
+            # export PATH="$PATH:$HOME/bin"
             bazel build //mainy:mainy //liby:*
       - run:
           name: Run after Bazel
           command: |
-            export PATH="$PATH:$HOME/bin"
+            # export PATH="$PATH:$HOME/bin"
             ./bazel-bin/mainy/mainy x y z
+      - run:
+          name: Generate Graph
+          command: |
+            # export PATH="$PATH:$HOME/bin"
+            bazel query 'deps(//mainy:mainy)' --output graph > graph.in
+            dot -Tpng < graph.in > graph.png
+            bazel query --noimplicit_deps 'deps(//mainy:mainy)' --output graph > simplified_graph.in
+            dot -Tpng < simplified_graph.in > simplified_graph.png
+      - store_artifacts:
+          path: ./*graph.in
+          destination: graphy
+      - store_artifacts:
+          path: ./*graph.png
+          destination: graphy
       - store_artifacts:
           path: $(readlink bazel-bin)/mainy/*
           destination: bazel-bin-mainy
