@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/openjdk:jdk
-    working_directory: ~/sheeeng/elpmaxe-mathy
+    working_directory: ~/sheeeng/omed-bazel
     steps:
       - checkout
       - run:
