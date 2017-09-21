@@ -43,9 +43,8 @@ jobs:
             chmod +x bazel-0.5.4-installer-linux-x86_64.sh
             ls -al
             ./bazel-0.5.4-installer-linux-x86_64.sh --user
-            # export PATH="$PATH:$HOME/bin"
             ls -aln ${HOME}/bin/bazel
-            sudo ln -s ${HOME}/bin/bazel /usr/bin/bazel
+            sudo ln -s ${HOME}/bin/bazel /usr/local/bin/bazel  # export PATH="$PATH:$HOME/bin"
             bazel clean --expunge
             bazel build
             ls $(bazel info output_base)/external
