@@ -1,0 +1,30 @@
+language: cpp
+
+compiler:
+  - clang
+  - gcc
+
+before_install:
+  - sudo apt-get update --quiet
+  - sudo apt-get install --yes build-essential
+  - sudo apt-get install --yes openjdk-8-jdk openjdk-8-jdk-headless
+  - sudo apt-get install --yes openjdk-8-jre openjdk-8-jre-headless
+  - sudo apt-get install --yes graphviz
+
+script:
+  - clang --version
+  - gcc --version
+  - java --version
+  - dot -V
+
+script:
+  - wget -q https://github.com/bazelbuild/bazel/releases/download/0.5.4/bazel-0.5.4-installer-linux-x86_64.sh
+  - chmod +x bazel-0.5.4-installer-linux-x86_64.sh
+  - ls -al
+  - ./bazel-0.5.4-installer-linux-x86_64.sh --user
+  - ls -aln ${HOME}/bin/bazel
+  - sudo ln -s ${HOME}/bin/bazel /usr/bin/bazel  # export PATH="$PATH:$HOME/bin"
+  - bazel clean --expunge
+  - bazel build
+  - ls $(bazel info output_base)/external
+  - bazel version
