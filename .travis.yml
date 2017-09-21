@@ -23,20 +23,19 @@ script:
   - ls -al
   - ./bazel-0.5.4-installer-linux-x86_64.sh --user
   - ls -aln ${HOME}/bin/bazel
-  - sudo ln -s ${HOME}/bin/bazel /usr/bin/bazel  # export PATH="$PATH:$HOME/bin"
+  - sudo ln -s ${HOME}/bin/bazel /usr/local/bin/bazel  # export PATH="$PATH:$HOME/bin"
+  - ls -al
   - bazel clean --expunge
   - bazel build
   - ls $(bazel info output_base)/external
   - bazel version
 
 script:
-  - ls -al /usr/bin/bazel
   - bazel build //mainy:mainy //liby:*
   - bazel run //mainy:mainy x y z
   - bazel test //testy:greety_test //testy:* --verbose_failures
 
 script:
-  - ls -al /usr/bin/bazel
   - mkdir graphy
   - cd graphy
   - bazel query 'deps(//mainy:mainy)' --output graph > graph.in
