@@ -28,3 +28,17 @@ script:
   - bazel build
   - ls $(bazel info output_base)/external
   - bazel version
+
+script:
+  - bazel build //mainy:mainy //liby:*
+  - bazel run //mainy:mainy x y z
+  - bazel test //testy:greety_test //testy:* --verbose_failures
+
+script:
+  - mkdir graphy
+  - cd graphy
+  - bazel query 'deps(//mainy:mainy)' --output graph > graph.in
+  - dot -Tpng < graph.in > graph.png
+  - bazel query --noimplicit_deps 'deps(//mainy:mainy)' --output graph > simplified_graph.in
+  - dot -Tpng < simplified_graph.in > simplified_graph.png
+  - cd -

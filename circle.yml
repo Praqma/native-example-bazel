@@ -59,7 +59,7 @@ jobs:
           name: Run after Bazel
           command: |
             # export PATH="$PATH:$HOME/bin"
-            ./bazel-bin/mainy/mainy x y z
+            bazel run //mainy:mainy x y z
       - run:
           name: Generate Graph
           command: |
