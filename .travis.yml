@@ -30,11 +30,13 @@ script:
   - bazel version
 
 script:
+  - ls -al /usr/bin/bazel
   - bazel build //mainy:mainy //liby:*
   - bazel run //mainy:mainy x y z
   - bazel test //testy:greety_test //testy:* --verbose_failures
 
 script:
+  - ls -al /usr/bin/bazel
   - mkdir graphy
   - cd graphy
   - bazel query 'deps(//mainy:mainy)' --output graph > graph.in
