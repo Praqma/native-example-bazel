@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/openjdk:jdk
-    working_directory: ~/sheeeng/omed-bazel
+    working_directory: ~/praqma/native-example-bazel
     steps:
       - checkout
       - run:
@@ -82,7 +82,7 @@ jobs:
   test:
     docker:
       - image: circleci/openjdk:jdk
-    working_directory: ~/sheeeng/omed-bazel
+    working_directory: ~/praqma/native-example-bazel
     steps:
       - checkout
       - run:
