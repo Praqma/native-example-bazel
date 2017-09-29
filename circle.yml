@@ -2,146 +2,60 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/openjdk:jdk
-    working_directory: ~/praqma/native-example-bazel
+      - image: praqma/native-bazel:latest
+    working_directory: /workspace
     steps:
       - checkout
       - run:
-          name: Update & Upgrade
+          name: Interpolating Environment Variables to Set Other Environment Variables
+          # If you need to interpolate other environment variables to set an environment variable, the only place to do this at the moment is in bash.
+          # CircleCI 2.0 automatically sets a $BASH_ENV variable to a random name in /tmp, and will source this file for each step.
+          # https://circleci.com/docs/2.0/env-vars/#interpolating-environment-variables-to-set-other-environment-variables
+          command: |
+            echo 'export DEBIAN_FRONTEND=noninteractive' >> $BASH_ENV
+            echo 'export WORKSPACE_DIR=/workspace' >> $BASH_ENV
+      - run:
+          name: Version
           command: |
             set -x
-            sudo apt-get update
-            sudo apt-get upgrade
+            cat /etc/*release
       - run:
-          name: Check Version
+          name: Build
           command: |
             set -x
-            java -version
-      - run:
-          name: Setup Make Prerequisites
-          command: |
-            set -x
-            echo "Setup Make Prerequisites ..."
-            sudo apt-get install --yes build-essential
-            gcc --version
-      - run:
-          name: Setup Dot
-          command: |
-            set -x
-            echo "Setup Dot ..."
-            sudo apt-get install --yes graphviz
-            dot -V
-      - run:
-          name: Setup Bazel
-          # Bash (not sh) is required for interpreting the Bazel installer script.
-          # The pkgconfig zip g++ zlib-dev unzip python tools required for decompressing installer.
-          # # https://docs.bazel.build/versions/master/install-ubuntu.html#1-install-required-packages
-          command: |
-            set -x
-            echo "Setup Bazel ..."
-            wget -q https://github.com/bazelbuild/bazel/releases/download/0.5.4/bazel-0.5.4-installer-linux-x86_64.sh
-            chmod +x bazel-0.5.4-installer-linux-x86_64.sh
-            ls -al
-            ./bazel-0.5.4-installer-linux-x86_64.sh --user
-            ls -aln ${HOME}/bin/bazel
-            sudo ln -s ${HOME}/bin/bazel /usr/local/bin/bazel  # export PATH="$PATH:$HOME/bin"
-            bazel clean --expunge
-            bazel build
-            ls $(bazel info output_base)/external
-            bazel version
-      - run:
-          name: Build with Bazel
-          command: |
-            # export PATH="$PATH:$HOME/bin"
-            bazel build //mainy:mainy //liby:*
-      - run:
-          name: Run after Bazel
-          command: |
-            # export PATH="$PATH:$HOME/bin"
-            bazel run //mainy:mainy x y z
-      - run:
-          name: Generate Graph
-          command: |
-            # export PATH="$PATH:$HOME/bin"
-            mkdir graphy
-            cd graphy
-            bazel query 'deps(//mainy:mainy)' --output graph > graph.in
-            dot -Tpng < graph.in > graph.png
-            bazel query --noimplicit_deps 'deps(//mainy:mainy)' --output graph > simplified_graph.in
-            dot -Tpng < simplified_graph.in > simplified_graph.png
-            cd -
+            cd ${WORKSPACE_DIR}
+            bash ${PWD}/build.sh
       - store_artifacts:
           path: graphy
           destination: graphy
-      - store_artifacts:
-          path: $(readlink bazel-bin)/mainy/*
-          destination: bazel-bin-mainy
-      - store_artifacts:
-          path: $(readlink bazel-bin)/liby/*
-          destination: bazel-bin-liby
   test:
     docker:
-      - image: circleci/openjdk:jdk
-    working_directory: ~/praqma/native-example-bazel
+      - image: praqma/native-bazel:latest
+    working_directory: /workspace
     steps:
       - checkout
       - run:
-          name: Update & Upgrade
+          name: Interpolating Environment Variables to Set Other Environment Variables
+          # If you need to interpolate other environment variables to set an environment variable, the only place to do this at the moment is in bash.
+          # CircleCI 2.0 automatically sets a $BASH_ENV variable to a random name in /tmp, and will source this file for each step.
+          # https://circleci.com/docs/2.0/env-vars/#interpolating-environment-variables-to-set-other-environment-variables
           command: |
-            set -x
-            sudo apt-get update
-            sudo apt-get upgrade
+            echo 'export DEBIAN_FRONTEND=noninteractive' >> $BASH_ENV
+            echo 'export WORKSPACE_DIR=/workspace' >> $BASH_ENV
       - run:
           name: Check Version
           command: |
             set -x
-            java -version
+            cat /etc/*release
       - run:
-          name: Setup Make Prerequisites
+          name: Build
           command: |
             set -x
-            echo "Setup Make Prerequisites ..."
-            sudo apt-get install --yes build-essential
-            gcc --version
-      - run:
-          name: Setup Bazel
-          # Bash (not sh) is required for interpreting the Bazel installer script.
-          # The pkgconfig zip g++ zlib-dev unzip python tools required for decompressing installer.
-          # # https://docs.bazel.build/versions/master/install-ubuntu.html#1-install-required-packages
-          command: |
-            set -x
-            echo "Setup Bazel ..."
-            wget -q https://github.com/bazelbuild/bazel/releases/download/0.5.4/bazel-0.5.4-installer-linux-x86_64.sh
-            chmod +x bazel-0.5.4-installer-linux-x86_64.sh
-            ls -al
-            ./bazel-0.5.4-installer-linux-x86_64.sh --user
-            export PATH="$PATH:$HOME/bin"
-            bazel clean --expunge
-            bazel build
-            ls $(bazel info output_base)/external
-            bazel version
-      - run:
-          name: Artifact
-          shell: /bin/sh
-          command: | # shorthanded command can also have multiple lines
-            echo "<p>Hi, <img width=16 src='img/world.svg'></p>" | sudo tee $CIRCLE_ARTIFACTS/hello.html
-            sudo mkdir $CIRCLE_ARTIFACTS/img
-            sudo curl "http://wikimedia.org/wikipedia/commons/e/e2/Ambox_globe.svg" -o $CIRCLE_ARTIFACTS/img/world.svg
-      - run:
-          name: Test using Bazel with Google Test
-          command: |
-            set -x
-            export PATH="$PATH:$HOME/bin"
-            bazel test //testy:greety_test //testy:* --verbose_failures
+            cd ${WORKSPACE_DIR}
+            bash ${PWD}/build.sh
       - store_artifacts:
-          path: $(readlink bazel-bin)/mainy/*
-          destination: bazel-bin-mainy
-      - store_artifacts:
-          path: $(readlink bazel-bin)/liby/*
-          destination: bazel-bin-liby
-      - store_artifacts:
-          path: $(readlink bazel-testlogs)/testy/*
-          destination: bazel-testlogs-testy
+          path: graphy
+          destination: graphy
 workflows:
   version: 2
   build_and_test:
