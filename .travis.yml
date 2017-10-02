@@ -21,7 +21,7 @@ script:
   - cat /etc/*-release
   - clang --version
   - gcc --version
-  - java --version
+  - java -version
   - dot -V
   - ls -al ${PWD}
   - docker run --rm --workdir=/workspace --volume ${PWD}:/workspace praqma/native-bazel:latest ./build.sh
