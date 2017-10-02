@@ -18,11 +18,6 @@ before_install:
   - docker pull praqma/native-bazel:latest
 
 script:
-  - cat /etc/*-release
-  - clang --version
-  - gcc --version
-  - java -version
-  - dot -V
   - ls -al ${PWD}
   - docker run --rm --workdir=/workspace --volume ${PWD}:/workspace praqma/native-bazel:latest ./build.sh
   - docker run --rm --workdir=/workspace --volume ${PWD}:/workspace praqma/native-bazel:latest ./test.sh
