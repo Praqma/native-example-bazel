@@ -7,8 +7,8 @@ export WORKSPACE_DIR=/workspace
 export THIRDPARTY_DIR=${WORKSPACE_DIR}/3rdparty
 
 if [ "$PWD" != "$WORKSPACE_DIR" ]; then
-  # Control will enter here if $DIRECTORY doesn't exists.
-  echo "Go to /workspace directory before running this script."
+  echo "Build helper script to be run inside a container."
+  echo "Go to $WORKSPACE_DIR directory before running this script."
   exit 1
 fi
 
@@ -25,5 +25,3 @@ dot -Tpng < graph.in > graph.png
 bazel query --noimplicit_deps 'deps(//mainy:mainy)' --output graph > simplified_graph.in
 dot -Tpng < simplified_graph.in > simplified_graph.png
 cd -
-
-bazel test //testy:greety_test //testy:* --verbose_failures
