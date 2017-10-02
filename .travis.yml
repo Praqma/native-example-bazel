@@ -23,8 +23,6 @@ script:
   - gcc --version
   - java --version
   - dot -V
-
-script:
   - ls -al ${PWD}
   - docker run --rm --workdir=/workspace --volume ${PWD}:/workspace praqma/native-bazel:latest ./build.sh
   - docker run --rm --workdir=/workspace --volume ${PWD}:/workspace praqma/native-bazel:latest ./test.sh
