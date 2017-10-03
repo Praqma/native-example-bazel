@@ -12,7 +12,5 @@ if [ "$PWD" != "$WORKSPACE_DIR" ]; then
   exit 1
 fi
 
-git submodule update --init --force
-
 bazel clean --expunge
 bazel test //testy:greety_test //testy:* --verbose_failures

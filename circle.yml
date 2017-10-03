@@ -19,6 +19,7 @@ jobs:
           command: |
             set -x
             cat /etc/*release
+      - run: git submodule update --init
       - run:
           name: Build
           command: |
@@ -47,6 +48,7 @@ jobs:
           command: |
             set -x
             cat /etc/*release
+      - run: git submodule update --init
       - run:
           name: Test
           command: |

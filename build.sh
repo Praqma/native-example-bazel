@@ -12,8 +12,6 @@ if [ "$PWD" != "$WORKSPACE_DIR" ]; then
   exit 1
 fi
 
-git submodule update --init --force
-
 bazel clean --expunge
 bazel build //mainy:mainy //liby:*
 bazel run //mainy:mainy x y z
