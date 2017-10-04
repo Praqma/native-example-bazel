@@ -2,4 +2,4 @@
 
 ## Steps
 
-  * Build image locally: `./docker-build.sh`
+* Build image locally: `./docker-build.sh`
